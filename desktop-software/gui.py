@@ -5,7 +5,7 @@ from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QImage, QPixmap
 from detect import detect
 from detect_drowsiness import detect_drowsiness
-from real_time_object_detection import detect_posture
+from real_time_object_detection import  find_the_distance
 import cv2
 
 class Sharingan(QMainWindow):
@@ -82,7 +82,7 @@ class Sharingan(QMainWindow):
             self.displayImage(self.image, 1)
 
         if self.posture_detect:
-            detected_image = detect_posture(self.image)
+            detected_image = find_the_distance(self.image)
             self.displayImage(detected_image, 1)
         else:
             self.displayImage(self.image, 1)

@@ -8,18 +8,7 @@ import numpy as np
 import argparse
 import imutils
 import time
-from distance_to_camera import find_the_distance
 import cv2
-
-# # construct the argument parse and parse the arguments
-# ap = argparse.ArgumentParser()
-# ap.add_argument("-p", "--prototxt", required=True,
-# 	help="path to Caffe 'deploy' prototxt file")
-# ap.add_argument("-m", "--model", required=True,
-# 	help="path to Caffe pre-trained model")
-# ap.add_argument("-c", "--confidence", type=float, default=0.2,
-# 	help="minimum probability to filter weak detections")
-# args = vars(ap.parse_args())
 
 prototxt = 'MobileNetSSD_deploy.prototxt.txt'
 model = 'MobileNetSSD_deploy.caffemodel'
@@ -36,15 +25,33 @@ COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
 print("[INFO] loading model...")
 net = cv2.dnn.readNetFromCaffe(prototxt, model)
 
-# # initialize the video stream, allow the cammera sensor to warmup,
-# # and initialize the FPS counter
-# print("[INFO] starting video stream...")
-# vs = VideoStream(src=0).start()
-# time.sleep(2.0)
-# fps = FPS().start()
+def find_marker(image):
+	# convert the image to grayscale, blur it, and detect edges
+	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+	gray = cv2.GaussianBlur(gray, (5, 5), 0)
+	edged = cv2.Canny(gray, 35, 125)
 
-def detect_posture(img):
-	# loop over the frames from the video stream
+	# find the contours in the edged image and keep the largest one;
+	# we'll assume that this is our piece of paper in the image
+	cnts = cv2.findContours(edged.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+	cnts = cnts[0] if imutils.is_cv2() else cnts[1]
+	c = max(cnts, key = cv2.contourArea)
+
+	# compute the bounding box of the of the paper region and return it
+	return cv2.minAreaRect(c)
+
+def distance_to_camera(knownWidth, focalLength, perWidth):
+	# compute and return the distance from the maker to the camera
+	return (knownWidth * focalLength) / perWidth
+
+# initialize the known distance from the camera to the object, which
+# in this case is 30 inches
+IDEAL_DISTANCE = 30.0
+
+IDEAL_WIDTH = 18.0 # inch - width of shoulders
+
+
+def find_the_distance(img):
 	while True:
 		# grab the 
 		# grab the frame dimensions and convert it to a blob
@@ -59,6 +66,15 @@ def detect_posture(img):
 
 		# loop over the detections
 		for i in np.arange(0, detections.shape[2]):
+			# load the furst image that contains an object that is KNOWN TO BE 2 feet
+			# from our camera, then find the paper marker in the image, and initialize
+			# the focal length
+			marker = find_marker(img)
+			focalLength = (marker[1][0] * IDEAL_DISTANCE) / w
+
+			# load the image, find the marker in the image, then compute the
+			# distance to the marker from the camera
+			inches = distance_to_camera(w, focalLength, marker[1][0])
 			# extract the confidence (i.e., probability) associated with
 			# the prediction
 			confidence = detections[0, 0, i, 2]
@@ -79,5 +95,15 @@ def detect_posture(img):
 			cv2.putText(img, label, (startX, y),
 				cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2)
 
-			return find_the_distance(img)
+			# draw a bounding box around the image and display it
+			box = cv2.cv.BoxPoints(marker) if imutils.is_cv2() else cv2.boxPoints(marker)
+			box = np.int0(box)
+			cv2.drawContours(img, [box], -1, (0, 255, 0), 2)
+			cv2.putText(img, "%.2fft" % (inches / 12),
+				(img.shape[1] - 200, img.shape[0] - 20), cv2.FONT_HERSHEY_SIMPLEX,
+				2.0, (0, 255, 0), 3)
+
+			return img
+
+	
 
