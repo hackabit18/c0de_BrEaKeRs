@@ -83,11 +83,14 @@ class Sharingan(QMainWindow):
 
         # timer
         self.time = QTime(0, 0, 0)
+        self.timer = QTimer(self)
 
-    def timerEvent(self):
-        self.time = self.time.addSecs(1)
+    def timerEvent(self):   
+        self.timer.start(100)
+        self.time.addSecs(1)
         # print(time.toString("hh:mm:ss"))
-        if (self.time[6:] >= 60) and (TOTAL < 18):
+        int_time = int(self.time.toString("hh:mm:ss")[6:])
+        if ( int_time >= 60) and (TOTAL < 18):
             self.child_win = PopUp('Its been more than a minute and you have only blinked {0} number of times.'.format(TOTAL))
             self.child_win.setWindowTitle('Alert')
             self.child_win.show()
@@ -132,6 +135,7 @@ class Sharingan(QMainWindow):
 
         ## timer for the images
         self.timer = QTimer(self)
+        self.timer.timeout.connect(self.timerEvent)
         self.timer.timeout.connect(self.update_frame)
         self.timer.start(0.1)
 
