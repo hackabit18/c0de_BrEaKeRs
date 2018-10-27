@@ -6,6 +6,7 @@ import imutils
 import time
 import dlib
 import cv2
+from db import write_stats_blinks
 
 def eye_aspect_ratio(eye):
 	# compute the euclidean distances between the two sets of
@@ -48,7 +49,6 @@ predictor = dlib.shape_predictor(shape_predictor)
 (rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
 def detect(img):
-		
 	# loop over frames from the video stream
 	while True:
 		# convert the image to grayScale
@@ -101,12 +101,14 @@ def detect(img):
 				# reset the eye frame counter
 				# global COUNTER
 				COUNTER = 0
-
 			# draw the total number of blinks on the frame along with
 			# the computed eye aspect ratio for the frame
 			cv2.putText(img, "Blinks: {}".format(TOTAL), (10, 30),
 				cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 			cv2.putText(img, "EAR: {:.2f}".format(ear), (300, 30),
 				cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-	
-			return img
+
+			return (img, TOTAL)
+
+# result = write_stats_blinks(USERNAME, TOTAL)
+# print(result)

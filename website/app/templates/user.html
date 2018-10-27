@@ -24,9 +24,47 @@
             </td>
         </tr>
     </table>
-    {% for post in posts %}
-        {% include '_post.html' %}
-    {% endfor %}
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Posts</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Stats</a>
+            </li>
+          </ul>
+          <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                {% for post in posts %}
+                    {% include '_post.html' %}
+                {% endfor %}
+            </div>
+            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                    <div class = 'row'>
+                        <div class="col-md-6">
+                                <div class="card" style="width: auto; box-shadow: 8px 8px 6px -6px #666666;">
+                                        <div class="card-body">
+                                          <h3 class="card-title">Blinks</h3>
+                                          <h6 class="card-subtitle mb-2 text-muted">Number of Times you have blinked.</h6>
+                                          <p class="card-text">You have blinked a total of <b>{{blinks}}</b> number of times since you last visited the app.</p>
+                                          <a href="https://twitter.com/intent/tweet?text=@justdvnsh%20needs%20a%20girlfriend%20!"
+                          data-size="large" className="btn btn-primary" id="tweet-quote">Tweet It</a>
+                                        </div>
+                                </div>
+                        </div>
+                        <div class="col-md-6">
+                                <div class="card" style="width: auto; box-shadow: 8px 8px 6px -6px #666666;">
+                                        <div class="card-body">
+                                          <h3 class="card-title">Number of Sleeps </h3>
+                                          <h6 class="card-subtitle mb-2 text-muted">Number of times you have felt drowsy.</h6>
+                                          <p class="card-text">You have felt drowsy a total of <b>{{ No_of_Sleeps }}</b> times since you last visited the app.</p>
+                                          <a href="https://twitter.com/intent/tweet?text=@justdvnsh%20needs%20a%20girlfriend%20!"
+                          data-size="large" className="btn btn-primary" id="tweet-quote">Tweet It</a>
+                                        </div>
+                                </div>
+                        </div>
+                    </div>
+            </div>
+          </div>
     <nav aria-label="...">
         <ul class="pager">
             <li class="previous{% if not prev_url %} disabled{% endif %}">

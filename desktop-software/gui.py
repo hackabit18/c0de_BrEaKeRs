@@ -10,7 +10,8 @@ import cv2
 import flask
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
-from db import find_user
+from db import find_user, write_stats_blinks, write_stats_drowsiness
+import time
 
 class Login(QMainWindow):
     def __init__(self):
@@ -64,16 +65,19 @@ class Sharingan(QMainWindow):
         self.startButton.clicked.connect(self.start_webcam)
         self.stopButton.clicked.connect(self.stop_webcam)
         self.actionLogout.triggered.connect(self.logout)
+        self.username = username
 
         ## Blink Detection
         self.blinkDetect.setCheckable(True)
         self.blinkDetect.toggled.connect(self.detect_webcam_blink)
         self.blink_detect = False
+        self.blinks_count = 0
 
         ## Drowsiness Detection
         self.drowsinessDetect.setCheckable(True)
         self.drowsinessDetect.toggled.connect(self.detectDrowsiness)
         self.drowsiness_detect = False
+        self.drowsiness_count = 0
 
         ## Posture Detection
         self.postureDetect.setCheckable(True)
@@ -93,6 +97,8 @@ class Sharingan(QMainWindow):
         else :
             self.blinkDetect.setText('Blink Detect')
             self.blink_detect = False
+            result = write_stats_blinks(self.username, self.blinks_count)
+            print(result)
 
     def detectDrowsiness(self, status):
         if status:
@@ -101,6 +107,8 @@ class Sharingan(QMainWindow):
         else:
             self.drowsinessDetect.setText('Drowsiness Detect')
             self.drowsiness_detect = False
+            result = write_stats_drowsiness(self.username, self.drowsiness_count)
+            print(result)
 
     def detect_posture(self, status):
         if status:
@@ -126,13 +134,15 @@ class Sharingan(QMainWindow):
 
         if self.blink_detect:
             detected_image = detect(self.image)
-            self.displayImage(detected_image, 1)
+            self.displayImage(detected_image[0], 1)
+            self.blinks_count = detected_image[1]
         else:
             self.displayImage(self.image, 1)
 
         if self.drowsiness_detect:
             detected_image = detect_drowsiness(self.image)
-            self.displayImage(detected_image, 1)
+            self.displayImage(detected_image[0], 1)
+            self.drowsiness_count = detected_image[1]
         else:
             self.displayImage(self.image, 1)
 
