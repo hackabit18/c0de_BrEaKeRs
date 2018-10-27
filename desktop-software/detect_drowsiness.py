@@ -58,7 +58,7 @@ EYE_AR_CONSEC_FRAMES = 48
 # indicate if the alarm is going off
 COUNTER = 0
 ALARM_ON = False
-
+TOTAL = 0
 # initialize dlib's face detector (HOG-based) and then create
 # the facial landmark predictor
 print("[INFO] loading facial landmark predictor...")
@@ -127,7 +127,9 @@ def detect_drowsiness(img):
 								args=(alarm,))
 							t.deamon = True
 							t.start()
-
+							global TOTAL
+							TOTAL += 1
+					
 					# draw an alarm on the frame
 					cv2.putText(img, "DROWSINESS ALERT!", (10, 30),
 						cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
@@ -144,4 +146,4 @@ def detect_drowsiness(img):
 			cv2.putText(img, "EAR: {:.2f}".format(ear), (300, 30),
 				cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 	
-			return img
+			return (img, TOTAL)

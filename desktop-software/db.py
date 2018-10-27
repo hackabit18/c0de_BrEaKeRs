@@ -42,3 +42,30 @@ def write_stats_blinks(username, blinks):
 
 # print(write_stats_blinks('test1', 3))
     
+def write_stats_drowsiness(username, number):
+    conn = sqlite3.connect('../website/app.db')
+    cursor = conn.cursor()
+    conn.row_factory = sqlite3.Row
+    print("Opened database successfully")
+    fetch_number_of_sleeps = (''' SELECT no_of_sleeps from user WHERE username = ?''')
+    cursor.execute(fetch_number_of_sleeps, [(username)])
+    
+    number_of_sleep = cursor.fetchone()
+    print(number_of_sleep[0])
+    print(number)
+    if number_of_sleep[0] == None:
+        number_of_sleep = number
+    else:
+        number_of_sleep = number_of_sleep[0] + number
+
+    update_no_of_sleep = (''' UPDATE user SET no_of_sleeps = ? WHERE username = ?''')
+    cursor.execute(update_no_of_sleep, [(number_of_sleep), (username)])
+    fetch_user = (''' SELECT no_of_sleeps from user WHERE username = ?''')
+    cursor.execute(fetch_user, [(username)])
+    results = cursor.fetchone()
+    # print(find_user('ankit'))
+    conn.commit()
+    conn.close()
+    return results
+
+# print(write_stats_drowsiness('test1', 2))

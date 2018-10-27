@@ -20,6 +20,9 @@ def before_request():
 
 
 @bp.route('/', methods=['GET', 'POST'])
+def app_template():
+    return render_template('app_template.html')
+
 @bp.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
@@ -68,8 +71,10 @@ def user(username):
                        page=posts.next_num) if posts.has_next else None
     prev_url = url_for('main.user', username=user.username,
                        page=posts.prev_num) if posts.has_prev else None
+    blinks = user.blinks
+    No_of_Sleeps = user.no_of_sleeps
     return render_template('user.html', user=user, posts=posts.items,
-                           next_url=next_url, prev_url=prev_url)
+                           next_url=next_url, prev_url=prev_url, blinks=blinks, No_of_Sleeps=No_of_Sleeps)
 
 
 @bp.route('/user/<username>/popup')
