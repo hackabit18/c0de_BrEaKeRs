@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow
+from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow, QLineEdit, QMessageBox
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QImage, QPixmap
@@ -7,6 +7,31 @@ from detect import detect
 from detect_drowsiness import detect_drowsiness
 from real_time_object_detection import  find_the_distance
 import cv2
+import flask
+from werkzeug.security import generate_password_hash, check_password_hash
+import sqlite3
+from db import find_user
+
+class Login(QMainWindow):
+    def __init__(self):
+        super(Login, self).__init__()
+        loadUi('login.ui', self)
+        self.username = QLineEdit(self.username)
+        self.password = QLineEdit(self.password)
+        self.loginButton.clicked.connect(self.handleLogin)
+
+    def handleLogin(self):
+        
+        username = str(self.username.text())
+        password = str(self.password.text())
+
+        print(self.username.text(), password)
+        results = find_user(username, password)
+        if results != None:
+            window = Sharingan()
+            window.show()
+        else:
+            pass    
 
 class Sharingan(QMainWindow):
     def __init__(self):
@@ -108,7 +133,7 @@ class Sharingan(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = Sharingan()
+    window = Login()
     window.setWindowTitle('Sharingan')
     window.show()
     sys.exit( app.exec_() )
