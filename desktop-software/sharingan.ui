@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>661</width>
-    <height>593</height>
+    <height>648</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>10</y>
+      <y>70</y>
       <width>121</width>
       <height>31</height>
      </rect>
@@ -31,7 +31,7 @@
     <property name="geometry">
      <rect>
       <x>270</x>
-      <y>10</y>
+      <y>70</y>
       <width>121</width>
       <height>31</height>
      </rect>
@@ -44,7 +44,7 @@
     <property name="geometry">
      <rect>
       <x>400</x>
-      <y>10</y>
+      <y>70</y>
       <width>121</width>
       <height>31</height>
      </rect>
@@ -57,7 +57,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>70</y>
+      <y>120</y>
       <width>640</width>
       <height>480</height>
      </rect>
@@ -76,7 +76,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>10</y>
+      <y>70</y>
       <width>121</width>
       <height>31</height>
      </rect>
@@ -89,13 +89,47 @@
     <property name="geometry">
      <rect>
       <x>530</x>
-      <y>10</y>
+      <y>70</y>
       <width>121</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
      <string>Posture Detect</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="username">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>10</y>
+      <width>401</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>14</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="timerLabel">
+    <property name="geometry">
+     <rect>
+      <x>450</x>
+      <y>10</y>
+      <width>191</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="text">
+     <string/>
     </property>
    </widget>
   </widget>
@@ -113,11 +147,7 @@
     <property name="title">
      <string>File</string>
     </property>
-   </widget>
-   <widget class="QMenu" name="menuEdit">
-    <property name="title">
-     <string>Edit</string>
-    </property>
+    <addaction name="actionLogout"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -125,9 +155,19 @@
     </property>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuEdit"/>
    <addaction name="menuHelp"/>
   </widget>
+  <action name="actionLogout">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Logout</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
