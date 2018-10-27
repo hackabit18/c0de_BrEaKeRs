@@ -1,9 +1,9 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow, QLineEdit, QMessageBox
 from PyQt5.uic import loadUi
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, QTime
 from PyQt5.QtGui import QImage, QPixmap
-from detect import detect
+from detect import detect, TOTAL
 from detect_drowsiness import detect_drowsiness
 from real_time_object_detection import  find_the_distance
 import cv2
@@ -16,8 +16,11 @@ class Login(QMainWindow):
     def __init__(self):
         super(Login, self).__init__()
         loadUi('login.ui', self)
-        self.username = QLineEdit(self.username)
-        self.password = QLineEdit(self.password)
+        username = QLineEdit()
+        username.show()
+        password = QLineEdit()
+        password.setEchoMode(QLineEdit.Password)
+        password.show()
         self.loginButton.clicked.connect(self.handleLogin)
 
     def handleLogin(self):
@@ -27,20 +30,42 @@ class Login(QMainWindow):
 
         print(self.username.text(), password)
         results = find_user(username, password)
+        print(results)
         if results != None:
-            window = Sharingan()
-            window.show()
+            self.close()
+            self.child_win = Sharingan(username)
+            self.child_win.setWindowTitle('Sharingan')
+            self.child_win.show()
         else:
             pass    
 
+class Popup(QMainWindow):
+    def __init__(self, message):
+        super(Popup, self).__init__()
+        loadUi('popup.ui', self)
+        self.messagePanel = self.messagePanel.setText(message)
+        self.okButton.clicked.connect(okHandler)
+        self.notOkButton.clicked.connect(notOkHandler)
+
+    def okHandler(self):
+        self.close()
+        self.child_win = Sharingan()
+        self.child_win.setWindowTitle('Sharingan')
+        self.child_win.show()
+    
+    def notOkHandler(self):
+        self.messagePanel.setText('You must take care of your optical health .!')
+
 class Sharingan(QMainWindow):
-    def __init__(self):
+    def __init__(self, username):
         super(Sharingan, self).__init__()
         loadUi('sharingan.ui',self)
+        self.username = self.username.setText("Hello " + username + ' . Hope you are as healthy as ever !')
         self.image = None
         self.startButton.clicked.connect(self.start_webcam)
         self.stopButton.clicked.connect(self.stop_webcam)
-        
+        self.actionLogout.triggered.connect(self.logout)
+
         ## Blink Detection
         self.blinkDetect.setCheckable(True)
         self.blinkDetect.toggled.connect(self.detect_webcam_blink)
@@ -55,6 +80,25 @@ class Sharingan(QMainWindow):
         self.postureDetect.setCheckable(True)
         self.postureDetect.toggled.connect(self.detect_posture)
         self.posture_detect = False
+
+        # timer
+        self.time = QTime(0, 0, 0)
+
+    def timerEvent(self):
+        self.time = self.time.addSecs(1)
+        # print(time.toString("hh:mm:ss"))
+        if (self.time[6:] >= 60) and (TOTAL < 18):
+            self.child_win = PopUp('Its been more than a minute and you have only blinked {0} number of times.'.format(TOTAL))
+            self.child_win.setWindowTitle('Alert')
+            self.child_win.show()
+        self.timerLabel.setText(self.time.toString("hh:mm:ss"))
+        
+
+    def logout(self):
+        self.close()
+        self.child_win = Login()
+        self.child_win.setWindowTitle('Sharingan')
+        self.child_win.show()
 
     def detect_webcam_blink(self, status):
         if status:
@@ -86,9 +130,10 @@ class Sharingan(QMainWindow):
         self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
         self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 
+        ## timer for the images
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_frame)
-        self.timer.start(1)
+        self.timer.start(0.1)
 
     def update_frame(self):
         ret, self.image = self.capture.read()
