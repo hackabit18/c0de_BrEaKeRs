@@ -11,6 +11,7 @@ import flask
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 from db import find_user, write_stats_blinks, write_stats_drowsiness
+import time
 
 class Login(QMainWindow):
     def __init__(self):
