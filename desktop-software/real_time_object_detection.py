@@ -48,9 +48,6 @@ def distance_to_camera(knownWidth, focalLength, perWidth):
 # in this case is 30 inches
 IDEAL_DISTANCE = 30.0
 
-IDEAL_WIDTH = 18.0 # inch - width of shoulders
-
-
 def find_the_distance(img):
 	while True:
 		# grab the 
@@ -58,7 +55,8 @@ def find_the_distance(img):
 		(h, w) = img.shape[:2]
 		blob = cv2.dnn.blobFromImage(cv2.resize(img, (300, 300)),
 			0.007843, (300, 300), 127.5)
-
+		
+		print('blob', blob)
 		# pass the blob through the network and obtain the detections and
 		# predictions
 		net.setInput(blob)
@@ -72,12 +70,14 @@ def find_the_distance(img):
 			marker = find_marker(img)
 			focalLength = (marker[1][0] * IDEAL_DISTANCE) / w
 
-			# load the image, find the marker in the image, then compute the
-			# distance to the marker from the camera
-			inches = distance_to_camera(w, focalLength, marker[1][0])
+			print('marker', marker)
+			print('i', i)
+
 			# extract the confidence (i.e., probability) associated with
 			# the prediction
 			confidence = detections[0, 0, i, 2]
+
+			print('detections',detections)
 
 			# extract the index of the class label from the
 			# `detections`, then compute the (x, y)-coordinates of
@@ -86,6 +86,18 @@ def find_the_distance(img):
 			box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
 			(startX, startY, endX, endY) = box.astype("int")
 
+			print('startX; startY; endX; endY', startX, startY, endX, endY)
+
+			print('width', marker)
+
+			for i in range(0, idx):
+
+				# load the image, find the marker in the image, then compute the
+				# distance to the marker from the camera
+				inches = distance_to_camera(marker[1][0], focalLength, marker[1][0])	
+
+			print('idx', idx)
+			print('inches', inches)
 			# draw the prediction on the frame
 			label = "{}: {:.2f}%".format(CLASSES[idx],
 				confidence * 100)
@@ -94,11 +106,6 @@ def find_the_distance(img):
 			y = startY - 15 if startY - 15 > 15 else startY + 15
 			cv2.putText(img, label, (startX, y),
 				cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2)
-
-			# draw a bounding box around the image and display it
-			box = cv2.cv.BoxPoints(marker) if imutils.is_cv2() else cv2.boxPoints(marker)
-			box = np.int0(box)
-			cv2.drawContours(img, [box], -1, (0, 255, 0), 2)
 			cv2.putText(img, "%.2fft" % (inches / 12),
 				(img.shape[1] - 200, img.shape[0] - 20), cv2.FONT_HERSHEY_SIMPLEX,
 				2.0, (0, 255, 0), 3)
